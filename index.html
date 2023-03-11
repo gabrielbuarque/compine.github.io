@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gerador de temas</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.4/dist/sweetalert2.min.css">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: rgb(39, 38, 38);
+      }
+
+      h1 {
+        text-align: left;
+        color:#fff;
+        margin-left: 3%;
+        margin-top: 3%;
+      }
+
+      .form {
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+        margin-top: 30px;
+        margin-right: 60%;
+        margin-left: 3%;
+      }
+
+      input {
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #e6228e;
+        font-size: 16px;
+        
+      }
+
+      label{
+        color: #fff;
+      }
+
+      button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #3e8e41;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Gerador de temas</h1>
+    <div class="form">
+      <label for="">Empresa</label>
+      <input type="text" id="emp" placeholder="Empresa">
+      <label for="">Ramo</label>
+      <input type="text" id="ramo" placeholder="Ramo">
+      <label for="">Quantidade de temas</label>
+      <input type="number" id="qntd" placeholder="Quantidade">
+      <button id="enviar">Enviar</button>
+    </div>
+    <div class="resultado">
+      <h2>Resultados:</h2>
+      <ul id="lista-resultados">
+      </ul>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.4/dist/sweetalert2.all.min.js"></script>
+    <script>
+
+const listaResultados = document.getElementById('lista-resultados');
+const webhookUrl = 'https://hook.us1.make.com/7tvqwbtcft8hih5jxs7ma8yhwfiloa3x';
+
+fetch(webhookUrl)
+  .then(response => response.json())
+  .then(data => {
+    listaResultados.innerHTML = '';
+    data.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = `Empresa: ${item.emp}, Ramo: ${item.ramo}, Quantidade: ${item.qntd}`;
+      listaResultados.appendChild(li);
+    });
+  })
+  .catch(error => {
+    console.error('Erro ao buscar os dados:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao buscar os dados',
+      text: error.message,
+      showConfirmButton: true
+    });
+  });
+
+      const enviarBotao = document.getElementById('enviar');
+
+      enviarBotao.addEventListener('click', () => {
+        const emp = document.getElementById('emp').value;
+        const ramo = document.getElementById('ramo').value;
+        const qntd = document.getElementById('qntd').value;
+        const webhookUrl = 'https://hook.us1.make.com/7tvqwbtcft8hih5jxs7ma8yhwfiloa3x';
+        const data = {emp, ramo, qntd};
+
+        Swal.fire({
+          title: 'Enviando dados...',
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        fetch(webhookUrl, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        })
+        .then(response => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Dados enviados com sucesso!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        })
+        .catch(error => {
+          console.error('Erro ao enviar os dados:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao enviar os dados',
+            text: error.message,
+            showConfirmButton: true
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
